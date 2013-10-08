@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using TShockAPI;
-using TShockAPI.DB;
 using Terraria;
 using TerrariaApi.Server;
 
+// using TShockAPI.DB;
 //using Mono.Data.Sqlite;
-//using MySql.Data.MySqlClient;
+using MySql.Data.MySqlClient;
 
 namespace WorldRefill
 {
@@ -36,7 +36,7 @@ namespace WorldRefill
             Commands.ChatCommands.Add(new Command("tshock.world.causeevents", CountEmpties, "genchests"));    //chests
             //Commands.ChatCommands.Add(new Command("tshock.world.causeevents", DoIslandHouse, "genihouse"));    //island house
             Commands.ChatCommands.Add(new Command("tshock.world.causeevents", DoHV, "hellavator"));
-            }
+        }
 
         protected override void Dispose(bool disposing)
         {
@@ -49,7 +49,7 @@ namespace WorldRefill
 
         public override Version Version
         {
-            get { return new Version("1.1.1"); }
+            get { return new Version("1.2"); }
         }
         public override string Name
         {
@@ -65,7 +65,7 @@ namespace WorldRefill
         }
 
         //Updating all players
-        public static void InformPlayers(bool hard=false)
+        public static void InformPlayers(bool hard = false)
         {
             foreach (TSPlayer person in TShock.Players)
             {
@@ -86,7 +86,7 @@ namespace WorldRefill
                         person.Teleport(myX, myy);
                     }
 
-                else
+                    else
                         person.SendTileSquare(person.TileX, person.TileY, 150);
                 }
             }
@@ -128,7 +128,7 @@ namespace WorldRefill
                 //notify user of command failure
                 args.Player.SendMessage(string.Format("Usage: /gencrystals (number of crystals to generate)"), Color.Green);
             }
-            
+
         }
 
         private void DoPots(CommandArgs args)
@@ -144,14 +144,14 @@ namespace WorldRefill
                 while (trycount < maxtries)
                 {
                     var tryX = WorldGen.genRand.Next(1, Main.maxTilesX);
-                    var tryY = WorldGen.genRand.Next((int) surface - 10, Main.maxTilesY);
-                        if (WorldGen.PlacePot(tryX,tryY, 28))
-                        {
-                            realcount++;
-                            if (realcount == mPot)
-                                break;
-                        }
-                        trycount++;
+                    var tryY = WorldGen.genRand.Next((int)surface - 10, Main.maxTilesY);
+                    if (WorldGen.PlacePot(tryX, tryY, 28))
+                    {
+                        realcount++;
+                        if (realcount == mPot)
+                            break;
+                    }
+                    trycount++;
 
                 }
                 args.Player.SendMessage(string.Format("Generated and hid {0} Pots.", realcount), Color.Green);
@@ -213,14 +213,14 @@ namespace WorldRefill
                     var tryX = WorldGen.genRand.Next(1, Main.maxTilesX);
                     var tryY = WorldGen.genRand.Next((int)surface + 10, Main.maxTilesY);
 
-                        WorldGen.Place3x2(tryX, tryY, 26);
-                        if (Main.tile[tryX, tryY].type == 26)
-                        {
-                            realcount++;
-                            if (realcount == mAltar)
-                                break;
-                        }
-                    
+                    WorldGen.Place3x2(tryX, tryY, 26);
+                    if (Main.tile[tryX, tryY].type == 26)
+                    {
+                        realcount++;
+                        if (realcount == mAltar)
+                            break;
+                    }
+
                     trycount++;
                 }
                 InformPlayers();
@@ -243,10 +243,10 @@ namespace WorldRefill
                 var realcount = 0;
                 while (trycount < maxtries)
                 {
-                    var tryX = WorldGen.genRand.Next(200, Main.maxTilesX -200);
-                    var tryY = WorldGen.genRand.Next((int)surface, Main.maxTilesY -300);
+                    var tryX = WorldGen.genRand.Next(200, Main.maxTilesX - 200);
+                    var tryY = WorldGen.genRand.Next((int)surface, Main.maxTilesY - 300);
 
-                  
+
                     if (Main.tile[tryX, tryY].wall == 0 && WorldGen.placeTrap(tryX, tryY, -1))
                     {
                         realcount++;
@@ -276,10 +276,10 @@ namespace WorldRefill
                 var realcount = 0;
                 while (trycount < maxtries)
                 {
-                    var tryX = WorldGen.genRand.Next(20, Main.maxTilesX -20);
-                    var tryY = WorldGen.genRand.Next((int)surface + 20, Main.maxTilesY -300);
-                    var tryType = WorldGen.genRand.Next((int) 2, 44);
-                   
+                    var tryX = WorldGen.genRand.Next(20, Main.maxTilesX - 20);
+                    var tryY = WorldGen.genRand.Next((int)surface + 20, Main.maxTilesY - 300);
+                    var tryType = WorldGen.genRand.Next((int)2, 44);
+
                     while (!Main.tile[tryX, tryY].active())
                     {
                         tryY++;
@@ -360,7 +360,7 @@ namespace WorldRefill
                 const int maxtries = 100000;
                 var realcount = 0;
                 int stid = 0;
-                string found="unknown type!";
+                string found = "unknown type!";
                 foreach (string ment in types)
                 {
                     found = ment.ToLower();
@@ -377,7 +377,7 @@ namespace WorldRefill
                     while (trycount < maxtries)
                     {
                         var tryX = WorldGen.genRand.Next(20, Main.maxTilesX - 20);
-                        var tryY = WorldGen.genRand.Next((int) surface + 20, Main.maxTilesY - 300);
+                        var tryY = WorldGen.genRand.Next((int)surface + 20, Main.maxTilesY - 300);
 
                         while (!Main.tile[tryX, tryY].active())
                         {
@@ -525,6 +525,20 @@ namespace WorldRefill
             {
                 oreType = 169;
             }
+
+            // 1.2 Hardmode Ores
+            else if (args.Parameters[0].ToLower() == "palladium")
+            {
+                oreType = 221;
+            }
+            else if (args.Parameters[0].ToLower() == "orichalcum")
+            {
+                oreType = 222;
+            }
+            else if (args.Parameters[0].ToLower() == "titanium")
+            {
+                oreType = 223;
+            }
             else
             {
                 ply.SendMessage("Warning! Typo in Tile name or Tile does not exist", Color.Red);    //should this be a help message instead?
@@ -548,8 +562,8 @@ namespace WorldRefill
                 //Get random number from 100 tiles each side
                 int i2 = WorldGen.genRand.Next(100, Main.maxTilesX - 100);
                 double worldY = Main.worldSurface;
-                //Rare Ores  - Adamantite, Demonite, Diamond
-                if ((oreType == 111) || (oreType == 22) || (oreType >= 63) && (oreType <= 68))
+                //Rare Ores  - Adamantite (Titanium), Demonite, Diamond
+                if ((oreType == 111) || (oreType == 22) || (oreType == 223) || (oreType >= 63) && (oreType <= 68))
                 {
                     //Some formula created by k0rd for getting somewhere between hell and roughly half way after rock
                     worldY = (Main.rockLayer + Main.rockLayer + (double)Main.maxTilesY) / 3.0;
@@ -596,8 +610,8 @@ namespace WorldRefill
                 var realcount = 0;
                 while (trycount < maxtries)
                 {
-                    var tryX = WorldGen.genRand.Next(20, Main.maxTilesX-20);
-                    var tryY = WorldGen.genRand.Next(150, Main.maxTilesY-300);
+                    var tryX = WorldGen.genRand.Next(20, Main.maxTilesX - 20);
+                    var tryY = WorldGen.genRand.Next(150, Main.maxTilesY - 300);
                     int direction = WorldGen.genRand.Next(2);
                     if (direction == 0)
                     {
@@ -607,21 +621,21 @@ namespace WorldRefill
                     {
                         direction = 1;
                     }
-                     while (!Main.tile[tryX, tryY].active() && tryY>149)
-                     {
-                         tryY--;
-                     }
+                    while (!Main.tile[tryX, tryY].active() && tryY > 149)
+                    {
+                        tryY--;
+                    }
                     tryY++;
-                     while (!Main.tile[tryX, tryY].active() && tryX > 10 && tryX < Main.maxTilesX - 10)
-                     {
-                         tryX += direction;
-                     }
+                    while (!Main.tile[tryX, tryY].active() && tryX > 10 && tryX < Main.maxTilesX - 10)
+                    {
+                        tryX += direction;
+                    }
                     tryX -= direction;
-                    
-                    if ((tryY< Main.maxTilesY - 300 )&& (tryX <Main.maxTilesX - 20) && (tryX>20) && (tryY>150))
+
+                    if ((tryY < Main.maxTilesY - 300) && (tryX < Main.maxTilesX - 20) && (tryX > 20) && (tryY > 150))
                     {
 
-                         WorldGen.TileRunner(tryX, tryY, (double)WorldGen.genRand.Next(4, 11), WorldGen.genRand.Next(2, 4), 51, true, (float)direction, -1f, false, false);
+                        WorldGen.TileRunner(tryX, tryY, (double)WorldGen.genRand.Next(4, 11), WorldGen.genRand.Next(2, 4), 51, true, (float)direction, -1f, false, false);
                         realcount++;
                         if (realcount == mWeb)
                             break;
@@ -629,7 +643,7 @@ namespace WorldRefill
                     trycount++;
 
                 }
-                args.Player.SendMessage(string.Format("Generated and hid {0} Webs.", realcount),Color.Green);
+                args.Player.SendMessage(string.Format("Generated and hid {0} Webs.", realcount), Color.Green);
                 InformPlayers();
             }
             else
@@ -657,7 +671,7 @@ namespace WorldRefill
                 counter++;
             }
             WorldGen.AddTrees();
-            args.Player.SendMessage("Enjoy your trees.",Color.Green);
+            args.Player.SendMessage("Enjoy your trees.", Color.Green);
             InformPlayers();
         }
         private void DoShrooms(CommandArgs args)
@@ -666,20 +680,20 @@ namespace WorldRefill
             int tryY = args.Player.TileY;
             const int offset = 25;
             WorldGen.ShroomPatch(tryX, tryY + 1);
-            for (int z = args.Player.TileX - offset; z < args.Player.TileX +offset; z++  )
+            for (int z = args.Player.TileX - offset; z < args.Player.TileX + offset; z++)
             {
-                for (int y = args.Player.TileY - offset; y < args.Player.TileY +offset; y++  )
+                for (int y = args.Player.TileY - offset; y < args.Player.TileY + offset; y++)
                 {
                     if (Main.tile[z, y].active())
                     {
-                        WorldGen.SpreadGrass(z, y ,59, 70, false );
+                        WorldGen.SpreadGrass(z, y, 59, 70, false);
 
                     }
                 }
             }
 
-                InformPlayers();
-                args.Player.SendMessage("Mushroom Farm generated.", Color.Green);
+            InformPlayers();
+            args.Player.SendMessage("Mushroom Farm generated.", Color.Green);
         }
 
         private void DoHV(CommandArgs args)
@@ -691,23 +705,23 @@ namespace WorldRefill
             int cx;
             int ypos = 0;
             int start = 0;
-            
+
             int bottom = Main.maxTilesY - 150;
             int width = 3;
-            if (args.Parameters.Count==1)
+            if (args.Parameters.Count == 1)
                 width = Int32.Parse(args.Parameters[0]);
             if (width < 2) width = 2;
             if (width > maxsize) width = maxsize;
-            start = meX - (width/2);
+            start = meX - (width / 2);
             ypos = meY + bump;
             start--;
             width++;
-            for (cx=start; cx < width + start; cx++)
+            for (cx = start; cx < width + start; cx++)
             {
                 int xc;
                 for (xc = ypos; xc < bottom; xc++)
                 {
-//                   WorldGen.KillTile(cx, xc,false,false,false);
+                    //                   WorldGen.KillTile(cx, xc,false,false,false);
                     if ((cx == start) || (cx == width + start - 1))
                     {
                         Main.tile[cx, xc].type = 121;
@@ -718,7 +732,7 @@ namespace WorldRefill
                         WorldGen.KillTile(cx, xc, false, false, false);
                         Main.tile[cx, xc].wall = 25;
                     }
-        //            Log.ConsoleError(string.Format("pos - x: {0} y: {1}",cx,xc));
+                    //            Log.ConsoleError(string.Format("pos - x: {0} y: {1}",cx,xc));
                 }
             }
 
@@ -730,29 +744,28 @@ namespace WorldRefill
         {
 
             //Code stold from InanZen - Not implemented yet
-            //// -------------- Chests  ----------------------
+            // -------------- Chests  ----------------------
             //int chests = 0;
-            //try
-            //{
-            //    switch (TShock.Config.StorageType.ToLower())
-            //    {
-            //        case "mysql":
-            //            string[] host = TShock.Config.MySqlHost.Split(':');
-            //            ChestDB = new MySqlConnection()
-            //            {
-            //                ConnectionString = string.Format("Server={0}; Port={1}; Database={2}; Uid={3}; Pwd={4};",
-            //                    host[0],
-            //                    host.Length == 1 ? "3306" : host[1],
-            //                    TShock.Config.MySqlDbName,
-            //                    TShock.Config.MySqlUsername,
-            //                    TShock.Config.MySqlPassword)
-            //            };
-            //            break;
-            //        case "sqlite":
-            //            string sql = Path.Combine(TShock.SavePath, "chests.sqlite");
-            //            ChestDB = new SqliteConnection(string.Format("uri=file://{0},Version=3", sql));
-            //            break;
-            //    }
+            try
+            {
+                switch (TShock.Config.StorageType.ToLower())
+                {
+                    case "mysql":
+                        string[] host = TShock.Config.MySqlHost.Split(':');
+                        ChestDB = new MySqlConnection();
+                        {
+                            string ConnectionString = string.Format("Server={0}; Port={1}; Database={2}; Uid={3}; Pwd={4};",
+                                host[0],
+                                host.Length == 1 ? "3306" : host[1],
+                                TShock.Config.MySqlDbName,
+                                TShock.Config.MySqlUsername,
+                                TShock.Config.MySqlPassword);
+                        };
+                        break;
+                    case "sqlite":
+                        Log.ConsoleInfo(" -> SQLite is Disabled sorry!");
+                        break;
+                }
             //    TShock.Utils.Broadcast(" -> generating chests...", Color.DarkMagenta);
             //    Log.ConsoleInfo(" -> generating chests..");
             //    ChestDB.Query("DELETE FROM Chests WHERE X BETWEEN @0 AND @1 AND Y BETWEEN @2 AND @3", startX, startX + startW, startY, startY + startH);
@@ -791,22 +804,18 @@ namespace WorldRefill
             //        }
             //    }
             //    ChestDB.Dispose();
-            //}
-            //catch (Exception ex)
-            //{
-            //    Log.ConsoleError(ex.ToString());
-            //}
+
             ////--------------------------
-            
+
             if (args.Parameters.Count == 0 || args.Parameters.Count > 2)
             {
-                args.Player.SendMessage("Usage: /genchests <amount> [use hardmode items true/false/default]", Color.Green);
+                args.Player.SendMessage("Usage: /genchests <amount> [gen mode: default/easy/all]", Color.Green);
             }
             int empty = 0;
             int tmpEmpty = 0;
             int chests = 0;
             string setting = "default";
-            if( args.Parameters.Count > 1 )
+            if (args.Parameters.Count > 1)
             {
                 setting = args.Parameters[1];
             }
@@ -825,8 +834,8 @@ namespace WorldRefill
                     if (found == false)
                     {
                         empty++;
-                  //      TShock.Utils.Broadcast(string.Format("Found chest {0} empty at x {1} y {2}", x, Main.chest[x].x,
-                  //                                           Main.chest[x].y));
+                              //TShock.Utils.Broadcast(string.Format("Found chest {0} empty at x {1} y {2}", x, Main.chest[x].x,
+                              //                                     Main.chest[x].y));
 
                         // destroying
                         WorldGen.KillTile(Main.chest[x].x, Main.chest[x].y, false, false, false);
@@ -838,9 +847,9 @@ namespace WorldRefill
 
             }
             args.Player.SendMessage(string.Format("uprooted {0} empty out of {1} chests.", empty, tmpEmpty), Color.Green);
-            if (chests + tmpEmpty + threshold > 1000)
-                chests = 1000 - tmpEmpty - threshold;
-            if (chests >0)
+            if (chests + tmpEmpty + threshold > 100000)
+                chests = 100000 - tmpEmpty - threshold;
+            if (chests > 0)
             {
                 int chestcount = 0;
                 chestcount = tmpEmpty;
@@ -849,40 +858,61 @@ namespace WorldRefill
                 while (newcount < chests)
                 {
                     int contain;
-                    if( setting == "default" )
+                    if (setting == "default")
                     {
-                        int[] itemID = new int[] { 168, 20, 22, 40, 42, 28, 292, 298, 299, 290, 8, 31, 72, 280, 284, 281, 282, 279, 285, 21, 289, 303, 291, 304, 49, 50, 52, 53, 54, 55, 51, 43, 167, 188, 295, 302, 305, 73, 301, 159, 65, 158, 117, 265, 294, 288, 297, 300, 218, 112, 220};
+                        // Default Items: Grenade(168), Copper Bar(20), Iron Bar(22), Wooden Arrow(40), Shuriken(42), Lesser Healing Potion(28), Ironskin Potion(292), Shine Potion (298), 
+                        // Night Owl Potion(299), Swiftness Potion(290), Torch(8), Bottle(31), Silver Coin(72), Spear(280), Wooden Boomerang(284), Blowpipe(281), Glowstick(282),
+                        // Throwing Knife(279), Aglet(285), Silver Bar(21), Regeneration Potion(289), Archery Potion(303), Gills Potion(291), Hunter Potion(304), Band of Regeneration(49),
+                        // Magic Mirror(50), Angel Statue(52), Cloud in a Bottle(53), Hermes Boots(54), Enchanted Boomerang(55), Jester's Arrow(51), Suspicious Looking Eye(43), Dynamite(167),
+                        // Healing Potion(188), Featherfall Potion(295), Water Walking Potion(302), Gravitation Potion(305), Gold Coin(73), Thorns Potion(301), Shiny Red Baloon(159), Starfury(65),
+                        // Lucky Horseshoe(158), Meteorite Bar(117), Hellfire Arrow(265), Magic Power Potion(294), Obsidian Skin Potion(288), Invisibility Potion(297), Battle Potion(300),
+                        // Flamelash (218), Flower of Fire(112), Sunfury(220)
+                        // ID's Only: 168, 20, 22, 40, 42, 28, 292, 298, 299, 290, 8, 31, 72, 280, 284, 281, 282, 279, 285, 21, 289, 303, 291, 304, 49, 50, 52, 53, 54, 55, 51, 43, 167, 188, 295, 302, 305, 73, 301, 159, 65, 158, 117, 265, 294, 288, 297, 300, 218, 112, 220
+
+                        // Plugin Version 1.2 - New Items: Rope Coil(985), Guide Voodoo Doll(267), Cobalt Shield(156)
+
+                        int[] itemID = new int[] { 168, 20, 22, 40, 42, 28, 292, 298, 299, 290, 8, 31, 72, 280, 284, 281, 282, 279, 285, 21, 289, 303, 291, 304, 49, 50, 52, 53, 54, 55, 51, 43, 167, 188, 295, 302, 305, 73, 301, 159, 65, 158, 117, 265, 294, 288, 297, 300, 218, 112, 220, 985, 267, 156 };
                         contain = itemID[WorldGen.genRand.Next(0, itemID.GetUpperBound(0))];
                     }
-                    else if (setting == "true")
+                    else if (setting == "all")
                     {
-                        contain = WorldGen.genRand.Next(1, 603);
+                        contain = WorldGen.genRand.Next(1, 1603);
                     }
-                    else if (setting == "false")
+                    else if (setting == "easy")
                     {
                         contain = WorldGen.genRand.Next(1, 363);
                     }
                     else
                     {
-                        args.Player.SendMessage(string.Format("Warning! Typo in second argument: {0}",args.Parameters[1]), Color.Red);
+                        args.Player.SendMessage(string.Format("Warning! Typo in second argument: {0}", args.Parameters[1]), Color.Red);
                         return;
                     }
                     int tryX = WorldGen.genRand.Next(20, Main.maxTilesX - 20);
-                    int tryY = WorldGen.genRand.Next((int) Main.worldSurface, Main.maxTilesY - 200);
-                        while (!Main.tile[tryX, tryY].active())
-                        {
-                            tryY++;
-                        }
-                        tryY--;
+                    int tryY = WorldGen.genRand.Next((int)Main.worldSurface, Main.maxTilesY - 200);
+                    while (!Main.tile[tryX, tryY].active())
+                    {
+                        tryY++;
+                    }
+                    tryY--;
                     WorldGen.KillTile(tryX, tryY, false, false, false);
-                    WorldGen.KillTile(tryX +1 , tryY, false, false, false);
+                    WorldGen.KillTile(tryX + 1, tryY, false, false, false);
                     WorldGen.KillTile(tryX, tryY + 1, false, false, false);
                     WorldGen.KillTile(tryX + 1, tryY, false, false, false);
 
                     if (WorldGen.AddBuriedChest(tryX, tryY, contain, true, 1))
                     {
-                        chestcount++;
-                        newcount++;
+                        try
+                        {
+                            string sql = "INSERT INTO Chests (X, Y, Account, Flags, Items, Password, WorldID) VALUES (" + tryX + ", " + tryY + ", 0, flag, " + contain + ", \"\", 2093487259)";
+                            MySqlCommand cmd = new MySqlCommand(sql, ChestDB);
+                            cmd.ExecuteNonQuery();
+                            chestcount++;
+                            newcount++;
+                        }
+                        catch (MySqlException ex)
+                        {
+                            Log.ConsoleError(ex.ToString());
+                        }
                     }
                     if (tries + 1 >= maxtries)
                         break;
@@ -892,6 +922,13 @@ namespace WorldRefill
                 args.Player.SendMessage(string.Format("generated {0} new chests - {1} total", newcount, chestcount), Color.Green);
                 InformPlayers();
             }
+            }
+            catch (Exception ex)
+            {
+                Log.ConsoleError(ex.ToString());
+            }
         }
+
+        public MySqlConnection ChestDB { get; set; }
     }
 }
