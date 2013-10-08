@@ -1,10 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.IO;
+using System.Linq;
+using System.Reflection;
+using System.Text;
 using TShockAPI;
 using Terraria;
 using TerrariaApi.Server;
 
-// using TShockAPI.DB;
+using TShockAPI.DB;
 //using Mono.Data.Sqlite;
 using MySql.Data.MySqlClient;
 
@@ -27,6 +33,7 @@ namespace WorldRefill
             Commands.ChatCommands.Add(new Command("tshock.world.causeevents", DoStatues, "genstatues"));   //Statues
             Commands.ChatCommands.Add(new Command("tshock.world.causeevents", DoOres, "genores"));         //ores
             Commands.ChatCommands.Add(new Command("tshock.world.causeevents", DoWebs, "genwebs"));         //webs
+            Commands.ChatCommands.Add(new Command("tshock.world.causeevents", ConvertNewChests, "drenchests"));         //webs
             //Commands.ChatCommands.Add(new Command("tshock.world.causeevents", DoMineHouse, "genhouse"));   //mine house
             Commands.ChatCommands.Add(new Command("tshock.world.causeevents", DoTrees, "gentrees"));       //trees
             //Commands.ChatCommands.Add(new Command("tshock.world.causeevents", DoIsland, "genisland"));     //floating island
@@ -888,7 +895,7 @@ namespace WorldRefill
                         return;
                     }
                     int tryX = WorldGen.genRand.Next(20, Main.maxTilesX - 20);
-                    int tryY = WorldGen.genRand.Next((int)Main.worldSurface, Main.maxTilesY - 200);
+                    int tryY = WorldGen.genRand.Next((int)Main.worldSurface, Main.maxTilesY - 100);
                     while (!Main.tile[tryX, tryY].active())
                     {
                         tryY++;
@@ -928,7 +935,32 @@ namespace WorldRefill
                 Log.ConsoleError(ex.ToString());
             }
         }
-
+        void ConvertNewChests(CommandArgs e)
+        {
+            int converted = 0;
+            StringBuilder items = new StringBuilder();
+            for (int i = 0; i < 1000; i++)
+            {
+                Terraria.Chest c = Main.chest[i];
+                if (c != null)
+                {
+                    for (int j = 0; j < 40; j++)
+                    {
+                        items.Append(c.item[j].netID + "," + c.item[j].stack + "," + c.item[j].prefix);
+                        if (j != 39)
+                        {
+                            items.Append(",");
+                        }
+                    }
+                    ChestDB.Query("INSERT OR IGNORE INTO Chests (X, Y, Account, Items, WorldID) VALUES (@0, @1, '', @2, @3)",
+                        c.x, c.y, items.ToString(), Main.worldID);
+                    converted++;
+                    items.Clear();
+                    Main.chest[i] = null;
+                }
+            }
+            e.Player.SendSuccessMessage("Converted {0} chest{1}.", converted, converted == 1 ? "" : "s");
+        }
         public MySqlConnection ChestDB { get; set; }
     }
 }
